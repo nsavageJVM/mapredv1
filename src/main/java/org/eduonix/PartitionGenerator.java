@@ -75,8 +75,8 @@ public class PartitionGenerator {
           BigDecimal value = BigDecimal.valueOf(Double.valueOf(tokens[1]));
           key = key.movePointRight(6);
           value = value.movePointRight(6);
-          word.set(key.toString() );
-          return value.intValue();
+          word.set(String.valueOf( value.intValue()));
+          return key.intValue();
       }
 
 
@@ -95,8 +95,8 @@ public class PartitionGenerator {
         if(devMode) {
 
           FileInputFormat.setInputPaths(conf, input);
-          FileOutputFormat.setOutputPath(conf, testOutput);
-         // FileOutputFormat.setOutputPath(conf, partitionOutput);
+         // FileOutputFormat.setOutputPath(conf, testOutput);
+          FileOutputFormat.setOutputPath(conf, partitionOutput);
 
         } else   {
 
@@ -124,134 +124,4 @@ public class PartitionGenerator {
     }
 
 
-}
-
-// will be input key for map function.
-class SeismicKey implements WritableComparable {
-
-    private Set rangeSpace = null;
-    private String domainElement;
-    private int dimRange;
-
-    public SeismicKey(String domainElement, Set rangeSpace) {
-        this.domainElement = domainElement;
-        this.rangeSpace = rangeSpace;
-        dimRange = rangeSpace.size();
-    }
-
-
-    public Set getRangeSpace() {
-        return rangeSpace;
-    }
-
-    public void setRangeSpace(Set rangeSpace) {
-        this.rangeSpace = rangeSpace;
-    }
-
-    public String getDomainElement() {
-        return domainElement;
-    }
-
-    public void setDomainElement(String domainElement) {
-        this.domainElement = domainElement;
-    }
-
-    public int getDimRange() {
-        return dimRange;
-    }
-
-    public void setDimRange(int dimRange) {
-        this.dimRange = dimRange;
-    }
-
-    public SeismicKey() {
-    }
-
-    @Override
-    public void readFields(DataInput dataIp) throws IOException {
-        domainElement = dataIp.readUTF();
-        dimRange = dataIp.readInt();
-        rangeSpace = new HashSet(dimRange);
-        for (int i = 0; i < dimRange; i++) {
-            rangeSpace.add(dataIp.readUTF());
-        }
-    }
-
-    @Override
-    public void write(DataOutput dataOp) throws IOException {
-        dataOp.writeUTF(rangeSpace.toString());
-        dataOp.writeInt(rangeSpace.size());
-        Iterator rcvr = rangeSpace.iterator();
-        while (rcvr.hasNext()) {
-            dataOp.writeUTF(rcvr.next().toString());
-        }
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        SeismicKey key =   (SeismicKey)o;
-
-        return domainElement.compareTo(key.getDomainElement());
-    }
-}
-
-// Input format for reading Seismic dataset
-class SeismicInputFormat extends FileInputFormat<Text, Text> {
-
-    private Path file = null;
-    private JobConf jc;
-
-    @Override
-    public RecordReader<Text, Text> getRecordReader(InputSplit inputSplit, JobConf entries, Reporter reporter) throws IOException {
-        return new RecordReader<Text, Text>() {
-
-
-
-            @Override
-            public boolean next(Text text, Text text2) throws IOException {
-                return false;
-            }
-
-            @Override
-            public Text createKey() {
-                return null;
-            }
-
-            @Override
-            public Text createValue() {
-                return null;
-            }
-
-            @Override
-            public long getPos() throws IOException {
-                return 0;
-            }
-
-            @Override
-            public void close() throws IOException {
-
-            }
-
-            @Override
-            public float getProgress() throws IOException {
-                return 0;
-            }
-        };
-    }
-
-
-
-    @Override
-    public InputSplit[] getSplits(JobConf job, int numSplits) throws IOException {
-
-        this.jc = job;
-
-        InputStream fileInputStream = FileSystem.get(jc).open(file);
-        Properties props = new Properties();
-
-        InputSplit[]  list = new InputSplit[numSplits];
-
-
-        return list;
-    }
 }

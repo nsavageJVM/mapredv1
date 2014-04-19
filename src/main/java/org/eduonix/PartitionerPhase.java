@@ -1,21 +1,26 @@
 package org.eduonix;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.IntWritable;
 
+import org.apache.hadoop.mapred.Reducer;
+import org.apache.hadoop.mapreduce.*;
+
+
 import java.io.IOException;
+import java.util.Iterator;
 
 
 /**
  * hadoop jar Partitioner /user/training/pre_process /user/training/output
 
  */
-public class Partitioner {
+public class PartitionerPhase {
 
     private static boolean devMode = true;
     private static String uniquePathId = ""+System.currentTimeMillis();
@@ -23,7 +28,7 @@ public class Partitioner {
 
     public static void main(String[] args) throws IOException {
 
-        JobConf conf = new JobConf(Partitioner.class);
+        JobConf conf = new JobConf(PartitionerPhase.class);
         conf.setJobName("sortexample");
 
         Path input = new Path("./pre_process/partition");
@@ -44,13 +49,16 @@ public class Partitioner {
 
         }
 
-        conf.setInputFormat(SequenceFileInputFormat.class);
-        conf.setOutputKeyClass(IntWritable.class);
-        conf.setOutputValueClass(Text.class);
+        conf.setInputFormat(TextInputFormat.class);
+        conf.setOutputKeyClass(Text.class);
+        conf.setOutputValueClass(LongWritable.class);
 
-        conf.setNumReduceTasks(2);
+        conf.setNumReduceTasks(1);
 
         JobClient.runJob(conf);
 
     }
+
 }
+
+
