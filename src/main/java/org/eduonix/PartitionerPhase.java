@@ -17,8 +17,7 @@ import java.util.Iterator;
 
 
 /**
- * hadoop jar Partitioner /user/training/pre_process /user/training/output
-
+ *
  */
 public class PartitionerPhase {
 
@@ -33,13 +32,14 @@ public class PartitionerPhase {
 
         Path input = new Path("./pre_process/partition");
         Path testOutput = new Path("post_process/"+uniquePathId+"/");
+        // we will consider sorted data to be finished and ready to be reduced
         Path partitionOutput = new Path("post_process/partition");
 
 
         if(devMode) {
 
             FileInputFormat.setInputPaths(conf, input);
-            //FileOutputFormat.setOutputPath(conf, testOutput);
+          //  FileOutputFormat.setOutputPath(conf, testOutput);
             FileOutputFormat.setOutputPath(conf, partitionOutput);
 
         } else   {
@@ -53,7 +53,7 @@ public class PartitionerPhase {
         conf.setOutputKeyClass(Text.class);
         conf.setOutputValueClass(LongWritable.class);
 
-        conf.setNumReduceTasks(1);
+        conf.setNumReduceTasks(0);
 
         JobClient.runJob(conf);
 

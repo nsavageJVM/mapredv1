@@ -92,13 +92,15 @@ public class MapReduceVersion1a {
         Configuration conf = new Configuration();
 
            Path input = new Path("./testData");
+
            Path testOutput = new Path("pre_process/"+uniquePathId+"/");
-           Path partitionOutput = new Path("pre_process/partition");
+            // we will consider this data to be aggregated and ready to be reduced
+           Path partitionOutput = new Path("post_process/partition");
 
            Job job = new Job(conf, "MapReduceVersion1a" + System.currentTimeMillis());
 
         // recursively delete the data set if it exists.
-            FileSystem.get(testOutput.toUri(), conf).delete(testOutput, true);
+            FileSystem.get(partitionOutput.toUri(), conf).delete(partitionOutput, true);
             job.setReducerClass(PostProcessorReducer.class);
             job.setMapperClass(PreprocessorMapper.class);
             job.setJarByClass(MapReduceVersion1a.class);
@@ -108,7 +110,8 @@ public class MapReduceVersion1a {
             job.setMapOutputValueClass(Text.class);
             job.setInputFormatClass(TextInputFormat.class);
             job.setOutputFormatClass(TextOutputFormat.class);
-            FileOutputFormat.setOutputPath(job, testOutput);
+         //   FileOutputFormat.setOutputPath(job, testOutput);
+            FileOutputFormat.setOutputPath(job, partitionOutput);
             FileInputFormat.setInputPaths(job, input);
             job.submit();
             System.out.println(job);

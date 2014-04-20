@@ -12,11 +12,14 @@ import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.Mapper;
+import org.apache.hadoop.mapred.Partitioner;
 import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.mapred.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.JobContext;
+
+
 import org.apache.hadoop.util.LineReader;
 
 import java.io.DataInput;
@@ -27,13 +30,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 /**
- *http://www.philippeadjiman.com/blog/2009/12/20/hadoop-tutorial-series-issue-2-getting-started-with-customized-partitioning/
- * hadoop jar /user/training/input /user/training/pre_process
- * https://developer.yahoo.com/hadoop/tutorial/module5.html
  * http://walrus.wr.usgs.gov/NAMSS/interactive_map.html
- * http://shrikantbang.wordpress.com/2013/10/22/hadoop-custom-input-format/
- * https://www.inkling.com/read/hadoop-definitive-guide-tom-white-3rd/chapter-7/input-formats
-
  */
 public class PartitionGenerator {
 
@@ -49,6 +46,7 @@ public class PartitionGenerator {
         public void map(Object key, Object value, OutputCollector outputCollector, Reporter reporter) throws IOException {
 
             LongWritable longKey = (LongWritable)key;
+            long l = longKey.get();
             Text textvalue = (Text)value;
             int nbOccurences = 0;
 
@@ -95,7 +93,7 @@ public class PartitionGenerator {
         if(devMode) {
 
           FileInputFormat.setInputPaths(conf, input);
-         // FileOutputFormat.setOutputPath(conf, testOutput);
+          //FileOutputFormat.setOutputPath(conf, testOutput);
           FileOutputFormat.setOutputPath(conf, partitionOutput);
 
         } else   {
@@ -111,8 +109,9 @@ public class PartitionGenerator {
         conf.setOutputValueClass(Text.class);
         conf.setNumReduceTasks(0);
         /**
-         * Sequence files are a basic file based data structure  TextOutputFormat.class)
-         * persisting the key/value pairs in a binary format  SequenceFileOutputFormat
+         * Sequence files are a basic file based data structure
+         * persisting the key/value pairs in a binary format
+         * conf.setOutputFormat(SequenceFileOutputFormat.class);
          */
         conf.setOutputFormat(TextOutputFormat.class);
 

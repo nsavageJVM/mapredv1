@@ -1,0 +1,22 @@
+// hortonworks
+mv /media/sf_ubu/MapreduceVersion1/mredv1.jar /root
+mv /media/sf_ubu/MapreduceVersion1/EtlDataInput /root
+
+hadoop fs -mkdir /user/root // if not exist
+hadoop fs -copyFromLocal EtlDataInput /user/root
+hadoop fs -ls /user/root
+hadoop fs -copyFromLocal mredv1.jar /tmp
+
+
+hadoop jar mredv1.jar ETLRunner
+
+hadoop fs -ls /user/root
+
+hadoop fs -copyToLocal /user/root/EtlDataOut /root
+
+
+
+
+
+
+
