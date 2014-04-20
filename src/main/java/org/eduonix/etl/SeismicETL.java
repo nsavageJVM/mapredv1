@@ -4,27 +4,17 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.mapred.TextOutputFormat;
 import org.eduonix.ETLRunner;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
 
-/**
- * http://stackoverflow.com/questions/12872590/hadoop-streaming-chaining-jobs
- */
+
 public class SeismicETL {
 
 
@@ -43,23 +33,13 @@ public class SeismicETL {
     public void extract() throws IOException, ClassNotFoundException, InterruptedException {
 
         JobConf conf = new JobConf(ETLRunner.class);
-        // recursively delete the data set if it exists.
         FileSystem.get(output.toUri(),conf).delete(output, true);
-
         FileInputFormat.setInputPaths(conf, input);
         FileOutputFormat.setOutputPath(conf, output);
-
-        //      conf.setInputFormat(SeismicInputFormat.class);
         conf.setMapperClass(LoadMapper.class);
         conf.setOutputKeyClass(Text.class);
         conf.setOutputValueClass(Text.class);
         conf.setNumReduceTasks(0);
-        /**
-         * Sequence files are a basic file based data structure
-         * persisting the key/value pairs in a binary format
-         * conf.setOutputFormat(SequenceFileOutputFormat.class);
-         */
-        //conf.setOutputFormat(TextOutputFormat.class);
         conf.setOutputFormat(TextOutputFormat.class);
         JobClient.runJob(conf);
 
@@ -97,7 +77,10 @@ public class SeismicETL {
         FileSystem fs = FileSystem.getLocal(new Configuration());
         fs.delete(outputHDFS, true);
         fs.mkdirs(outputHDFS);
-        fs.copyToLocalFile(false, transformDataOutput, outputHDFS );
+        // use clusterPath in place of transformDataOutput in
+        //  fs.copyToLocalFile( transformDataOutput, outputHDFS );for hortonworks cluster
+        Path clusterPath = new Path("/user/root/EtlDataOut");
+        fs.copyToLocalFile( clusterPath, outputHDFS );
         FileStatus[] filList = fs.listStatus(outputHDFS);
         // print out all the files.
         for (FileStatus stat : filList) {

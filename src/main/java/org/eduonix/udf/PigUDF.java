@@ -56,7 +56,9 @@ public class PigUDF extends EvalFunc<String> {
        pigServer.registerQuery(  "pig_gen = foreach pig_udf generate $0 as x, $1 as y;");
 
        System.out.println("Schema : " + pigServer.dumpSchema("pig_udf"));
+
        Iterator<Tuple> tuples = pigServer.openIterator("pig_udf");
+
        while(tuples.hasNext()){
            Tuple t = tuples.next();
            System.out.println((t.get(0) + " " + t.get(1)));
@@ -77,7 +79,7 @@ public class PigUDF extends EvalFunc<String> {
     public String exec(Tuple input) throws IOException {
 
         if (null == input || input.size() == 0) {
-            return "found nul";
+            return "found null";
         }
 
         DataByteArray key = (DataByteArray)input.get(0);
