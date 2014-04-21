@@ -21,7 +21,7 @@ public class SeismicETL {
 
     Path input;
     Path output;
-    Path outputHDFS = new Path("./tmp/sesmicData");
+    Path outputHDFS = new Path("./sesmicData");
 
     public SeismicETL(Path input, Path output) {
         this.input = input;
@@ -60,11 +60,6 @@ public class SeismicETL {
         conf.setOutputKeyClass(Text.class);
         conf.setOutputValueClass(Text.class);
         conf.setNumReduceTasks(0);
-        /**
-         * Sequence files are a basic file based data structure
-         * persisting the key/value pairs in a binary format SequenceFileInputFormat
-         * conf.setOutputFormat(SequenceFileOutputFormat.class);
-         */
         conf.setOutputFormat(TextOutputFormat.class);
 
         JobClient.runJob(conf);
@@ -77,16 +72,8 @@ public class SeismicETL {
         FileSystem fs = FileSystem.getLocal(new Configuration());
         fs.delete(outputHDFS, true);
         fs.mkdirs(outputHDFS);
-        // use clusterPath in place of transformDataOutput in
-        //  fs.copyToLocalFile( transformDataOutput, outputHDFS );for hortonworks cluster
-        Path clusterPath = new Path("/user/root/EtlDataOut");
-        fs.copyToLocalFile( clusterPath, outputHDFS );
-        FileStatus[] filList = fs.listStatus(outputHDFS);
-        // print out all the files.
-        for (FileStatus stat : filList) {
-            System.out.println(stat.getPath() + "  " + stat.getLen());
-        }
-        System.out.println();
+        FileSystem fs2 = FileSystem.get(new Configuration());
+        fs2.copyToLocalFile( transformDataOutput, outputHDFS );
 
     }
 

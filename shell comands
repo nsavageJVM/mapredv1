@@ -1,6 +1,21 @@
 // hortonworks
-mv /media/sf_ubu/MapreduceVersion1/mredv1.jar /root
-mv /media/sf_ubu/MapreduceVersion1/EtlDataInput /root
+
+terminal access
+ssh root@127.0.0.1 -p 2222
+pswd  hadoop
+
+dont forget to set up automount shared folder in virtual box settings -> shared folder
+
+in the vm at /medai you will see the name of the shared directory it will have the form 'sf_<username>
+use this to build the path to your jar and EtlDataInput  folder,
+
+I am ubu and my path to top level code folder on my real box is /home/ubu/mapredv1 so looks like
+
+mv /media/sf_ubu/mapredv1/mredv1.jar /root
+mv /media/sf_ubu/mapredv1/EtlDataInput /root
+
+mv /media/<path to jar>/mredv1.jar /root
+mv /media/<path to folder>/EtlDataInput /root
 
 hadoop fs -mkdir /user/root // if not exist
 hadoop fs -copyFromLocal EtlDataInput /user/root
@@ -16,6 +31,11 @@ hadoop fs -copyToLocal /user/root/EtlDataOut /root
 
 vim part-00000
 vim part-00001
+
+FileNotFoundException: File /user/root/EtlDataOut does not exist
+
+ hadoop fs -rm -r /tmp/mredv1.jar
+
 
 
 
